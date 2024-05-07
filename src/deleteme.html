@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Weather Tracker</title>
+    <script type="text/javascript">
+      function getweather() {
+        // Get selected week
+        var selectedWeek = document.getElementById("week").value;
+
+        // Calculate start and end date for the selected week
+        var currentDate = new Date();
+        var currentMonth = currentDate.getMonth() + 1; // Months are zero indexed, so add 1
+        var currentYear = currentDate.getFullYear();
+        var startDate = new Date(
+          currentYear,
+          currentMonth - 1,
+          selectedWeek * 7 - 6
+        ); // Calculate first day of the selected week
+        var endDate = new Date(currentYear, currentMonth - 1, selectedWeek * 7); // Calculate last day of the selected week
+        var startDateString = startDate.toISOString().slice(0, 10); // Convert start date to YYYY-MM-DD format
+        var endDateString = endDate.toISOString().slice(0, 10); // Convert end date to YYYY-MM-DD format
+
+        // Make API call to get weather data for the selected week
+        var apiUrl =
+          "https://api.open-meteo.com/v1/forecast?latitude=40.71&longitude=-74.01&timezone=America/New_York&daily=temperature_2m_max,temperature_2m_min&start_date=" +
+          startDateString +
+          "&end_date=" +
+          endDateString;
+        fetch(apiUrl)
+          .then((response) => response.json())
+          .then((data) => {
+            // Create table with weather data
+            var tableHtml =
+              "<table><tr><th>Day</th><th>Date</th><th>Min Temperature</th><th>Max Temperature</th></tr>";
+        
+            data.forEach((dayData, index) => {
+              var dayOfWeek = new Date(
+                currentYear,
+                currentMonth - 1,
+                selectedWeek * 7 - 6 + index
+              ).toLocaleDateString("en-US", { weekday: "long" }); // Calculate day of week
+              var date = new Date(dayData.time * 1000).toLocaleDateString(
+                "en-US",
+                {
+                  month: "short",
+                  day: "numeric"
+                }
+              ); // Convert timestamp to date string
+              var minTemp = dayData.temperature_2m_min.toFixed(1) + "°C"; // Convert min temperature to string with one decimal point and Celsius symbol
+              var maxTemp = dayData.temperature_2m_max.toFixed(1) + "°C"; // Convert max temperature to string with one decimal point and Celsius symbol
+              tableHtml +=
+                "<tr><td>" +
+                dayOfWeek +
+                "</td><td>" +
+                date +
+                "</td><td>" +
+                minTemp +
+                "</td><td>" +
+                maxTemp +
+                "</td></tr>";
+            });
+            tableHtml += "</table>";
+            document.getElementById("table-container").innerHTML = tableHtml;
+          });
+      }
+    </script>
+  </head>
+  <body>
+    <h2>Weather Tracker</h2>
+    <form>
+      <label for="week">Select Week:</label>
+      <select id="week">
+        <option value="1">Week 1</option>
+        <option value="2">Week 2</option>
+        <option value="3">Week 3</option>
+        <option value="4">Week 4</option>
+      </select>
+      <button type="button" onclick="getweather()">Start Tracking</button>
+    </form>
+    <div id="table-container"></div>
+  </body>
+</html>
