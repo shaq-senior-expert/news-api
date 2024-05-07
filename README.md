@@ -1,3 +1,5 @@
+![image](https://github.com/shaq-senior-expert/news-api/assets/29052109/1f497382-d7dd-40ea-9aee-61dab0add0e3)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
